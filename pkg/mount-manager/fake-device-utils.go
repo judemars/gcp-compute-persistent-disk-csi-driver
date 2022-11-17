@@ -41,6 +41,6 @@ func (_ *fakeDeviceUtils) DisableDevice(devicePath string) error {
 	return nil
 }
 
-func (_ *fakeDeviceUtils) Resize(resizer resizefs.Resizefs, devicePath string, deviceMountPath string) (bool, error){
+func (_ *fakeDeviceUtils) Resize(resizer resizefs.Resizefs, devicePath string, deviceMountPath string) (bool, error) {
 	return false, nil
 }
