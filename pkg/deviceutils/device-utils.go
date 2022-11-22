@@ -366,7 +366,7 @@ func udevadmChangeToDrive(devFsPath string) error {
 	klog.V(4).Infof("Running command: %s", cmd.String())
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("udevadmChangeToDrive: udevadm trigger failed for drive %q with output %s: %v", devFsPath, string(out), err)
+		return fmt.Errorf("udevadmChangeToDrive: udevadm trigger failed for drive %q with output %s: %v.", devFsPath, string(out), err)
 	}
 	return nil
 }
