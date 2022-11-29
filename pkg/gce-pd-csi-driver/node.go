@@ -341,6 +341,8 @@ func (ns *GCENodeServer) NodeStageVolume(ctx context.Context, req *csi.NodeStage
 				devicePath, stagingTargetPath, fstype, options, err))
 	}
 
+	// what if VC access is readonly? Skip this?
+
 	// Part 4: Resize filesystem.
 	// https://github.com/kubernetes/kubernetes/issues/94929
 	resizer := resizefs.NewResizeFs(ns.Mounter)
@@ -502,6 +504,15 @@ func (ns *GCENodeServer) NodeExpandVolume(ctx context.Context, req *csi.NodeExpa
 			klog.V(4).Infof("NodeExpandVolume succeeded on %v to %s, capability is block so this is a no-op", volumeID, volumePath)
 			return &csi.NodeExpandVolumeResponse{}, nil
 		}
+
+		readonly, err := getReadOnlyFromCapability(volumeCapability)
+		if err != nil {
+			return nil, status.Error(codes.Internal, fmt.Sprintf("failed to check if capability for volume %s is readonly: %v", volumeID, err))
+		}
+		if readonly {
+			klog.V(4).Infof("NodeExpandVolume succeeded on %v to %s, capability access is readonly so this is a no-op", volumeID, volumePath)
+			return &csi.NodeExpandVolumeResponse{}, nil
+		}
 	}
 
 	// TODO(#328): Use requested size in resize if provided
@@ -509,7 +520,6 @@ func (ns *GCENodeServer) NodeExpandVolume(ctx context.Context, req *csi.NodeExpa
 	_, err = resizer.Resize(devicePath, volumePath)
 	if err != nil {
 		return nil, status.Error(codes.Internal, fmt.Sprintf("error when resizing volume %s from device '%s' at path '%s': %v", volKey.String(), devicePath, volumePath, err))
-
 	}
 
 	diskSizeBytes, err := getBlockSizeBytes(devicePath, ns.Mounter)

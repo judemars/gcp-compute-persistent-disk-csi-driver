@@ -41,7 +41,6 @@ $ ./test/run-e2e-local.sh
 ```
 
 ### Sanity Tests
-> **_NOTE:_**  Sanity tests are currently failing, tracked by https://github.com/kubernetes-sigs/gcp-compute-persistent-disk-csi-driver/issues/990.
 
 Sanity tests can be run from VS Code, etc directly or via the cmd line:
 ```
